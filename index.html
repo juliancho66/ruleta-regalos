@@ -74,11 +74,13 @@ function draw(){
 }
 function spin(){
  if(busy)return;busy=true;button.disabled=true;
- const winner=Math.floor(Math.random()*8);
- const current=(((-rotation)%(Math.PI*2))+(Math.PI*2))%(Math.PI*2);
- const desired=(winner+.5)*step;
- const delta=((desired-current)%(Math.PI*2)+(Math.PI*2))%(Math.PI*2);
- const start=rotation,target=rotation-(Math.PI*2*(6+Math.floor(Math.random()*3)))-delta;
+ const winner=Math.floor(Math.random()*gifts.length);
+ // La flecha está a la izquierda (ángulo π). Centra el segmento ganador
+ // exactamente bajo esa flecha, usando la misma geometría que draw().
+ const start=rotation;
+ const desiredRotation=(Math.PI*1.5)-((winner+0.5)*step);
+ const delta=((desiredRotation-start)%(Math.PI*2)+(Math.PI*2))%(Math.PI*2);
+ const target=start+(Math.PI*2*(6+Math.floor(Math.random()*3)))+delta;
  const duration=4800+Math.random()*700,begin=performance.now();
  result.innerHTML="<small>La suerte está echada</small><strong>🎡 Girando...</strong><span>Un momento...</span>";
  function frame(now){
