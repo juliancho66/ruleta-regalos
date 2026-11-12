@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#641078">
+<title>29 por siempre · Ruleta de regalos</title>
+<style>
+:root{--purple:#68117e;--pink:#d84ac1;--gold:#f5d58b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#fff;background:radial-gradient(circle at 50% 0%,#a83caa 0,#4c075f 48%,#21002d 100%);display:flex;justify-content:center;padding:24px 14px 40px}
+main{width:min(100%,560px);text-align:center}
+h1{font-family:Georgia,serif;font-size:clamp(2rem,8vw,3.2rem);margin:8px 0 2px;color:#ffe7b5;text-shadow:0 2px 15px #ffb9ff66}
+.sub{margin:0 0 18px;color:#f8dff8;font-size:1.05rem}
+.panel{background:linear-gradient(145deg,#fff9ff,#f4ddf6);color:#42104d;border:3px solid #e6bf79;border-radius:25px;padding:18px 14px 20px;box-shadow:0 16px 45px #13001888}
+.wheel-wrap{width:min(82vw,410px);aspect-ratio:1;position:relative;margin:8px auto 18px}
+canvas{width:100%;height:100%;display:block;filter:drop-shadow(0 5px 8px #4a164c55)}
+.pointer{position:absolute;z-index:2;left:-7px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:19px solid transparent;border-bottom:19px solid transparent;border-left:0;border-right:30px solid #5b176b;filter:drop-shadow(1px 2px 2px #777)}
+button{font:inherit;font-weight:800;border:0;border-radius:999px;padding:14px 25px;cursor:pointer}
+#spin{width:min(100%,340px);color:white;background:linear-gradient(100deg,#79169b,#d044b9);box-shadow:0 5px 16px #9a31a766;font-size:1.12rem}
+button:disabled{opacity:.55;cursor:wait}
+#result{margin:16px auto 0;min-height:100px;padding:14px;border-radius:16px;background:#f2e3f5;border:1px solid #d9b8df;display:flex;flex-direction:column;justify-content:center}
+#result small{letter-spacing:.12em;text-transform:uppercase;color:#7b5480;font-weight:700}
+#result strong{font-size:1.35rem;color:#5d146c;margin-top:5px}
+#result span{font-size:.9rem;color:#805c85;margin-top:3px}
+.list{margin:18px 0 0;text-align:left;display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:.88rem}
+.list div{display:flex;gap:7px;align-items:flex-start}
+.list b{color:#9b3ba8}
+.note{font-size:.8rem;color:#f0d8f0;margin:15px 0 0}
+@media(max-width:380px){.list{grid-template-columns:1fr}.panel{padding:13px 10px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>29 por siempre ♡</h1>
+  <p class="sub">Mi ruleta de regalos soñados 🎀</p>
+  <section class="panel">
+    <div class="wheel-wrap">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="800" height="800" aria-label="Ruleta de ocho regalos"></canvas>
+    </div>
+    <button id="spin">🎡 GIRAR LA RULETA</button>
+    <div id="result" aria-live="polite">
+      <small>Tu regalo seleccionado</small>
+      <strong>💜 ¡Buena suerte!</strong>
+      <span>Presiona el botón para comenzar</span>
+    </div>
+    <div class="list" id="giftlist"></div>
+  </section>
+  <p class="note">¡Que la suerte decida! 💜🎁</p>
+</main>
+<script>
+(()=>{
+const gifts=[
+["Un jean","👖"],["Aretes de oro","💛"],["Tenis deportivos","👟"],
+["Leggings y top deportivo","💜"],["Sandalias planas","👡"],
+["Botines de cuero negro, planos","🥾"],["Peeling facial","✨"],
+["¡Regalo sorpresa!","🎁"]
+];
+const colors=["#d51c40","#e56c08","#078f48","#b43bb5","#233fc5","#079c91","#ed6031","#087dc0"];
+const canvas=document.getElementById("wheel"),ctx=canvas.getContext("2d"),button=document.getElementById("spin"),result=document.getElementById("result");
+let rotation=0,busy=false;
+const step=Math.PI*2/gifts.length;
+gifts.forEach((g,i)=>{const d=document.createElement("div");d.innerHTML=`<b>${i+1}.</b><span>${g[1]} ${g[0]}</span>`;document.getElementById("giftlist").appendChild(d)});
+function draw(){
+ const cx=400,cy=400,r=375;ctx.clearRect(0,0,800,800);ctx.save();ctx.translate(cx,cy);
+ gifts.forEach((g,i)=>{
+  const a=rotation+i*step-Math.PI/2,b=a+step,mid=a+step/2;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a,b);ctx.closePath();ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=5;ctx.stroke();
+  ctx.save();ctx.rotate(mid);ctx.textAlign="center";ctx.textBaseline="middle";ctx.shadowColor="#222";ctx.shadowBlur=3;ctx.fillStyle="#fff";ctx.font="bold 57px Arial";ctx.fillText(String(i+1),220,0);ctx.font="42px Arial";ctx.fillText(g[1],300,0);ctx.restore();
+ });
+ ctx.beginPath();ctx.arc(0,0,65,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#e4c4e9";ctx.lineWidth=8;ctx.stroke();ctx.fillStyle="#75177e";ctx.font="bold 30px Georgia";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("29",0,0);ctx.restore();
+ ctx.beginPath();ctx.arc(cx,cy,r+2,0,Math.PI*2);ctx.strokeStyle="#dfc18a";ctx.lineWidth=8;ctx.stroke();
+}
+function spin(){
+ if(busy)return;busy=true;button.disabled=true;
+ const winner=Math.floor(Math.random()*8);
+ const current=(((-rotation)%(Math.PI*2))+(Math.PI*2))%(Math.PI*2);
+ const desired=(winner+.5)*step;
+ const delta=((desired-current)%(Math.PI*2)+(Math.PI*2))%(Math.PI*2);
+ const start=rotation,target=rotation-(Math.PI*2*(6+Math.floor(Math.random()*3)))-delta;
+ const duration=4800+Math.random()*700,begin=performance.now();
+ result.innerHTML="<small>La suerte está echada</small><strong>🎡 Girando...</strong><span>Un momento...</span>";
+ function frame(now){
+  const t=Math.min(1,(now-begin)/duration),ease=1-Math.pow(1-t,5);
+  rotation=start+(target-start)*ease;draw();
+  if(t<1)requestAnimationFrame(frame);
+  else{
+   rotation=target;draw();busy=false;button.disabled=false;
+   const g=gifts[winner];
+   result.innerHTML=`<small>¡Tu regalo seleccionado!</small><strong>${g[1]} ${g[0]}</strong><span>${winner===7?"¡Una sorpresa especial te espera! 🎉":"¿Será este el regalo elegido? 💜"}</span>`;
+  }
+ }
+ requestAnimationFrame(frame);
+}
+button.addEventListener("click",spin);draw();
+})();
+</script>
+</body>
+</html>
