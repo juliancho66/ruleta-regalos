@@ -116,7 +116,7 @@ spinBtn.addEventListener("click",()=>{
   spinning=true;spinBtn.disabled=true;
   const index=Math.floor(Math.random()*gifts.length);
   const center=-Math.PI/2+(index+.5)*slice;
-  const target=(((-Math.PI/2-center)%(Math.PI*2))+(Math.PI*2))%(Math.PI*2);
+  const target=((Math.PI-center)%(Math.PI*2)+(Math.PI*2))%(Math.PI*2);
   const extra=6+Math.floor(Math.random()*3);
   const finalRotation=extra*Math.PI*2+target;
   const start=performance.now(), duration=5200, initial=rotation;
